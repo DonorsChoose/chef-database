@@ -70,7 +70,13 @@ class Chef
         private
         def exists?
           begin
-            exists = db("template1").query("SELECT * FROM pg_user WHERE usename='#{@new_resource.username}'").num_tuples != 0
+            #exists = db("template1").query("SELECT * FROM pg_user WHERE usename='#{@new_resource.username}'").num_tuples != 0
+            exists = db("template1").query("SELECT usename AS role FROM pg_user
+                                            WHERE usename='#{@new_resource.username}'
+                                            UNION
+                                            SELECT groname AS role FROM pg_group
+                                            WHERE groname='#{@new_resource.username}'"
+                                          ).num_tuples != 0
           ensure
             close
           end
